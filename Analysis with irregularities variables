@@ -1,0 +1,655 @@
+#importing all the tables presenting the data
+
+Groups <- read.csv("/Users/myriamobialo/Desktop/thesis/EI_group_variables.csv", header = T)
+head(Groups)
+Hours <- read.csv("/Users/myriamobialo/Desktop/thesis/EI_hour_variables.csv", header = T)
+head(Hours)
+
+#importing fundamental libraries 
+
+library(factoextra)
+library(formattable)
+library(reactablefmtr)
+
+#reducing the dataset to only adult individuals
+
+G <- Groups[Groups$AGE_YEAR > 18 & Groups$AGE_YEAR < 64, ]  
+G$AGE_YEAR
+
+#putting all the variables of irregularities on one single variable called mean
+
+mean <- data.frame(G$Irregularity, G$Irregularity.1, G$Irregularity.2, G$Irregularity.3, G$Irregularity.4, G$Irregularity.5)
+
+# Determine and visualize the optimal number of clusters 
+fviz_nbclust(mean, kmeans, method = "wss") + 
+  labs(subtitle = "Elbow method")
+fviz_nbclust(mean, kmeans, method = "silhouette")+
+  labs(subtitle = "Silhouette method")
+
+#starting cluster analysis with different k values
+#k=2
+k_means <- kmeans(mean, centers = 2, nstart = 25)
+# Assigning the clusters
+cluster_assignments <- k_means$cluster
+# Cluster centroids
+cluster_centroids <- k_means$centers
+cluster_centroids
+# Visualization 
+fviz_cluster(k_means, mean, repel = TRUE, shape = NULL)
+plot(mean, col = (cluster_assignments+1), main = "K-means", pch = 0.2, cex = 2)
+
+# Finding the 2 groups
+print(k_means)
+k_means$size
+
+d_means <- mean
+clusters <- k_means$cluster
+# d_mean is the dataframe with the clusters 
+d_means <- cbind(mean, clusters)
+
+#d_means is the table with the irregularities and the clusters 
+
+#obtaining the groups 
+d_assignment_1 <- subset(d_means, clusters == 1)
+d_assignment_2 <- subset(d_means, clusters == 2)
+
+head(d_assignment_1)
+head(d_assignment_2)
+
+#first group 
+cluster_1_mean <- colMeans(d_assignment_1)
+cluster_1_mean
+head(mean)
+cluster_1_sd <- sapply(d_assignment_1[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")], sd)
+#to remove the cluster column
+cluster_1_mean <- cluster_1_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+
+cluster_1 <- data.frame(cluster_1_mean, cluster_1_sd) 
+cluster_1
+
+#changing the row names 
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#second group 
+cluster_2_mean <- colMeans(d_assignment_2)
+cluster_2_sd <- sapply(d_assignment_2[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_2_mean <- cluster_2_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_2 <- data.frame(cluster_2_mean, cluster_2_sd)
+
+#changing the row names 
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.5"] <- "from 22 to 06"
+
+cluster_1
+cluster_2
+# table with mean and standard deviations for clusters
+
+formattable(cluster_1) 
+formattable(cluster_2)
+
+### K= 3 
+k <- 3
+kmeans_model <- kmeans(mean, centers = k, nstart= 25)
+cluster_assignments <- kmeans_model$cluster
+fviz_cluster(kmeans_model, mean, repel = TRUE, shape = NULL)
+plot(mean, col = (cluster_assignments+1), main = "K-means", pch=0.2, cex = 2)
+kmeans_model$size
+print(kmeans_model)
+
+# Finding the 3 groups 
+data_mean_K3 <- mean
+clusters <- kmeans_model$cluster
+# data_mean_K3 is the dataframe with the clusters 
+data_mean_K3 <- cbind(mean, clusters)
+# lets get the groups 
+d_assignment_1 <- subset(data_mean_K3, clusters == 1)
+d_assignment_2 <- subset(data_mean_K3, clusters == 2)
+d_assignment_3 <- subset(data_mean_K3, clusters == 3)
+
+head(d_assignment_1)
+head(d_assignment_2)
+head(d_assignment_3)
+
+#first group 
+cluster_1_mean <- colMeans(d_assignment_1)
+cluster_1_mean
+cluster_1_sd <- sapply(d_assignment_1[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")], sd)
+#to remove the cluster column
+cluster_1_mean <- cluster_1_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+
+cluster_1 <- data.frame(cluster_1_mean, cluster_1_sd) 
+
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#second group 
+cluster_2_mean <- colMeans(d_assignment_2)
+cluster_2_sd <- sapply(d_assignment_2[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_2_mean <- cluster_2_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_2 <- data.frame(cluster_2_mean, cluster_2_sd)
+
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#third group 
+cluster_3_mean <- colMeans(d_assignment_3)
+cluster_3_sd <- sapply(d_assignment_3[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+cluster_3_mean <- cluster_3_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_3 <- data.frame(cluster_3_mean, cluster_3_sd)
+
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.5"] <- "from 22 to 06"
+
+# table with mean and standard deviations for clusters
+formattable(cluster_1) 
+formattable(cluster_2)
+formattable(cluster_3)
+
+###K=4
+k <- 4
+kmeans_model <- kmeans(mean, centers = k, nstart= 25)
+# Assigning the clusters 
+cluster_assignments <- kmeans_model$cluster
+# Visualization 
+fviz_cluster(kmeans_model, mean, repel = TRUE, shape = NULL)
+plot(mean, col = (cluster_assignments+1), main = "K-means", pch=0.2, cex = 2)
+# Size of clusters 
+kmeans_model$size
+print(kmeans_model)
+
+# Finding the 4 groups 
+data_mean_K4 <- mean
+clusters <- kmeans_model$cluster
+# data_mean is the dataframe with the clusters 
+data_mean_K4 <- cbind(mean, clusters, G$meandayintake)
+# lets get the groups 
+d_assignment_1 <- subset(data_mean_K4, clusters == 1)
+d_assignment_2 <- subset(data_mean_K4, clusters == 2)
+d_assignment_3 <- subset(data_mean_K4, clusters == 3)
+d_assignment_4 <- subset(data_mean_K4, clusters == 4)
+
+head(d_assignment_1)
+head(d_assignment_2)
+head(d_assignment_3)
+head(d_assignment_4)
+
+#first group 
+cluster_1_mean <- colMeans(d_assignment_1)
+cluster_1_mean
+cluster_1_sd <- sapply(d_assignment_1[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")], sd)
+#to remove the cluster column
+cluster_1_mean <- cluster_1_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+
+cluster_1 <- data.frame(cluster_1_mean, cluster_1_sd) 
+
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#second group 
+cluster_2_mean <- colMeans(d_assignment_2)
+cluster_2_sd <- sapply(d_assignment_2[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_2_mean <- cluster_2_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_2 <- data.frame(cluster_2_mean, cluster_2_sd)
+
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.5"] <- "from 22 to 06"
+
+
+#third group 
+
+cluster_3_mean <- colMeans(d_assignment_3)
+cluster_3_sd <- sapply(d_assignment_3[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_3_mean <- cluster_3_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_3 <- data.frame(cluster_3_mean, cluster_3_sd)
+
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.5"] <- "from 22 to 06"
+
+
+#forth group 
+
+cluster_4_mean <- colMeans(d_assignment_4)
+cluster_4_sd <- sapply(d_assignment_4[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_4_mean <- cluster_4_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_4 <- data.frame(cluster_4_mean, cluster_4_sd)
+
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.5"] <- "from 22 to 06"
+
+# table with mean and standard deviations for clusters
+
+formattable(cluster_1) 
+formattable(cluster_2)
+formattable(cluster_3)
+formattable(cluster_4)
+
+###K=5
+k <- 5
+kmeans_model <- kmeans(mean, centers = k, nstart= 25)
+# Assigning the clusters 
+cluster_assignments <- kmeans_model$cluster
+# Visualization 
+fviz_cluster(kmeans_model, mean, repel = TRUE, shape = NULL)
+plot(mean, col = (cluster_assignments+1), main = "K-means with k=5", pch=0.2, cex = 2)
+# Size of clusters 
+kmeans_model$size
+print(kmeans_model)
+
+# Finding the 5 groups 
+data_mean_K5 <- mean
+clusters <- kmeans_model$cluster
+# data_mean is the dataframe with the clusters 
+data_mean_K5 <- cbind(mean, clusters)
+# lets get the groups 
+d_assignment_1 <- subset(data_mean_K5, clusters == 1)
+d_assignment_2 <- subset(data_mean_K5, clusters == 2)
+d_assignment_3 <- subset(data_mean_K5, clusters == 3)
+d_assignment_4 <- subset(data_mean_K5, clusters == 4)
+d_assignment_5 <- subset(data_mean_K5, clusters == 5)
+
+head(d_assignment_1)
+head(d_assignment_2)
+head(d_assignment_3)
+head(d_assignment_4)
+head(d_assignment_5)
+
+#first group 
+cluster_1_mean <- colMeans(d_assignment_1)
+cluster_1_mean
+cluster_1_sd <- sapply(d_assignment_1[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")], sd)
+#to remove the cluster column
+cluster_1_mean <- cluster_1_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+
+cluster_1 <- data.frame(cluster_1_mean, cluster_1_sd) 
+
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#second group 
+cluster_2_mean <- colMeans(d_assignment_2)
+cluster_2_sd <- sapply(d_assignment_2[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_2_mean <- cluster_2_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_2 <- data.frame(cluster_2_mean, cluster_2_sd)
+
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#third group 
+
+cluster_3_mean <- colMeans(d_assignment_3)
+cluster_3_sd <- sapply(d_assignment_3[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_3_mean <- cluster_3_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_3 <- data.frame(cluster_3_mean, cluster_3_sd)
+
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#forth group 
+
+cluster_4_mean <- colMeans(d_assignment_4)
+cluster_4_sd <- sapply(d_assignment_4[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_4_mean <- cluster_4_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_4 <- data.frame(cluster_4_mean, cluster_4_sd)
+
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#fifth group 
+
+cluster_5_mean <- colMeans(d_assignment_5)
+cluster_5_sd <- sapply(d_assignment_5[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_5_mean <- cluster_5_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_5 <- data.frame(cluster_5_mean, cluster_5_sd)
+
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.5"] <- "from 22 to 06"
+
+# table with mean and standard deviations for clusters
+formattable(cluster_1) 
+formattable(cluster_2)
+formattable(cluster_3)
+formattable(cluster_4)
+formattable(cluster_5)
+
+###K=6
+k <- 6
+kmeans_model <- kmeans(mean, centers = k, nstart= 25)
+# Assigning the clusters 
+cluster_assignments <- kmeans_model$cluster
+# Visualization 
+fviz_cluster(kmeans_model, mean, repel = TRUE, shape = NULL)
+plot(mean, col = (cluster_assignments+1), main = "K-means", pch=0.2, cex = 2)
+# Size of clusters 
+kmeans_model$size
+print(kmeans_model)
+
+# Finding the 6 groups 
+data_mean_K6 <- mean
+clusters <- kmeans_model$cluster
+# data_mean is the dataframe with the clusters 
+data_mean_K6 <- cbind(mean, clusters)
+# lets get the groups 
+d_assignment_1 <- subset(data_mean_K6, clusters == 1)
+d_assignment_2 <- subset(data_mean_K6, clusters == 2)
+d_assignment_3 <- subset(data_mean_K6, clusters == 3)
+d_assignment_4 <- subset(data_mean_K6, clusters == 4)
+d_assignment_5 <- subset(data_mean_K6, clusters == 5)
+d_assignment_6 <- subset(data_mean_K6, clusters == 6)
+
+head(d_assignment_1)
+head(d_assignment_2)
+head(d_assignment_3)
+head(d_assignment_4)
+head(d_assignment_5)
+head(d_assignment_6)
+
+#first group 
+cluster_1_mean <- colMeans(d_assignment_1)
+cluster_1_mean
+cluster_1_sd <- sapply(d_assignment_1[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")], sd)
+#to remove the cluster column
+cluster_1_mean <- cluster_1_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+
+cluster_1 <- data.frame(cluster_1_mean, cluster_1_sd) 
+
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#second group 
+cluster_2_mean <- colMeans(d_assignment_2)
+cluster_2_sd <- sapply(d_assignment_2[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_2_mean <- cluster_2_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_2 <- data.frame(cluster_2_mean, cluster_2_sd)
+
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#third group 
+
+cluster_3_mean <- colMeans(d_assignment_3)
+cluster_3_sd <- sapply(d_assignment_3[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_3_mean <- cluster_3_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_3 <- data.frame(cluster_3_mean, cluster_3_sd)
+
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#forth group 
+
+cluster_4_mean <- colMeans(d_assignment_4)
+cluster_4_sd <- sapply(d_assignment_4[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_4_mean <- cluster_4_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_4 <- data.frame(cluster_4_mean, cluster_4_sd)
+
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#fifth group 
+
+cluster_5_mean <- colMeans(d_assignment_5)
+cluster_5_sd <- sapply(d_assignment_5[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_5_mean <- cluster_5_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_5 <- data.frame(cluster_5_mean, cluster_5_sd)
+
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#sixth group 
+cluster_6_mean <- colMeans(d_assignment_6)
+cluster_6_sd <- sapply(d_assignment_6[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_6_mean <- cluster_6_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_6 <- data.frame(cluster_6_mean, cluster_6_sd)
+
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.5"] <- "from 22 to 06"
+
+# table with mean and standard deviations for clusters
+formattable(cluster_1) 
+formattable(cluster_2)
+formattable(cluster_3)
+formattable(cluster_4)
+formattable(cluster_5)
+formattable(cluster_6)
+
+###K=7
+k <- 7
+kmeans_model <- kmeans(mean, centers = k, nstart= 25)
+# Assigning the clusters 
+cluster_assignments <- kmeans_model$cluster
+# Visualization 
+fviz_cluster(kmeans_model, mean, repel = TRUE, shape = NULL)
+plot(mean, col = (cluster_assignments+1), main = "K-means", pch=0.2, cex = 2)
+# Size of clusters 
+kmeans_model$size
+print(kmeans_model)
+
+# Finding the 7 groups 
+data_mean_K7 <- mean
+clusters <- kmeans_model$cluster
+# data_mean is the dataframe with the clusters 
+data_mean_K7 <- cbind(mean, clusters)
+# lets get the groups 
+d_assignment_1 <- subset(data_mean_K7, clusters == 1)
+d_assignment_2 <- subset(data_mean_K7, clusters == 2)
+d_assignment_3 <- subset(data_mean_K7, clusters == 3)
+d_assignment_4 <- subset(data_mean_K7, clusters == 4)
+d_assignment_5 <- subset(data_mean_K7, clusters == 5)
+d_assignment_6 <- subset(data_mean_K7, clusters == 6)
+d_assignment_7 <- subset(data_mean_K7, clusters == 7)
+
+head(d_assignment_1)
+head(d_assignment_2)
+head(d_assignment_3)
+head(d_assignment_4)
+head(d_assignment_5)
+head(d_assignment_6)
+head(d_assignment_7)
+
+#first group 
+cluster_1_mean <- colMeans(d_assignment_1)
+cluster_1_mean
+cluster_1_sd <- sapply(d_assignment_1[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")], sd)
+#to remove the cluster column
+cluster_1_mean <- cluster_1_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+
+cluster_1 <- data.frame(cluster_1_mean, cluster_1_sd) 
+
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_1)[row.names(cluster_1) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#second group 
+cluster_2_mean <- colMeans(d_assignment_2)
+cluster_2_sd <- sapply(d_assignment_2[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_2_mean <- cluster_2_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_2 <- data.frame(cluster_2_mean, cluster_2_sd)
+
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_2)[row.names(cluster_2) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#third group 
+
+cluster_3_mean <- colMeans(d_assignment_3)
+cluster_3_sd <- sapply(d_assignment_3[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_3_mean <- cluster_3_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_3 <- data.frame(cluster_3_mean, cluster_3_sd)
+
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_3)[row.names(cluster_3) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#forth group 
+
+cluster_4_mean <- colMeans(d_assignment_4)
+cluster_4_sd <- sapply(d_assignment_4[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_4_mean <- cluster_4_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_4 <- data.frame(cluster_4_mean, cluster_4_sd)
+
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_4)[row.names(cluster_4) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#fifth group 
+
+cluster_5_mean <- colMeans(d_assignment_5)
+cluster_5_sd <- sapply(d_assignment_5[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_5_mean <- cluster_5_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_5 <- data.frame(cluster_5_mean, cluster_5_sd)
+
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_5)[row.names(cluster_5) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#sixth group 
+cluster_6_mean <- colMeans(d_assignment_6)
+cluster_6_sd <- sapply(d_assignment_6[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_6_mean <- cluster_6_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_6 <- data.frame(cluster_6_mean, cluster_6_sd)
+
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_6)[row.names(cluster_6) == "G.Irregularity.5"] <- "from 22 to 06"
+
+#seventh group 
+cluster_7_mean <- colMeans(d_assignment_7)
+cluster_7_sd <- sapply(d_assignment_7[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")],sd)
+
+cluster_7_mean <- cluster_7_mean[c("G.Irregularity", "G.Irregularity.1","G.Irregularity.2", "G.Irregularity.3", "G.Irregularity.4" ,"G.Irregularity.5")]
+cluster_7 <- data.frame(cluster_7_mean, cluster_7_sd)
+
+row.names(cluster_7)[row.names(cluster_7) == "G.Irregularity"] <- "from 6 to 9"
+row.names(cluster_7)[row.names(cluster_7) == "G.Irregularity.1"] <- "from 9 to 12"
+row.names(cluster_7)[row.names(cluster_7) == "G.Irregularity.2"] <- "from 12 to 15"
+row.names(cluster_7)[row.names(cluster_7) == "G.Irregularity.3"] <- "from 15 to 19"
+row.names(cluster_7)[row.names(cluster_7) == "G.Irregularity.4"] <- "from 19 to 22"
+row.names(cluster_7)[row.names(cluster_7) == "G.Irregularity.5"] <- "from 22 to 06"
+
+# table with mean and standard deviations for clusters
+
+formattable(cluster_1) 
+formattable(cluster_2)
+formattable(cluster_3)
+formattable(cluster_4)
+formattable(cluster_5)
+formattable(cluster_6)
+formattable(cluster_7)
+
