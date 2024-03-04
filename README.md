@@ -6,7 +6,9 @@ One of the crucial roles of the circadian rhythm is to regulate and influence th
 The circadian clock controls nutrient processing and critical homeostasis by directing the expression and function of proteins involved in the digestion of cholesterol, amino acids, lipids, glycogen, and glucose digestion system. 
 By extension, many hormones of the digestive system, such as insulin, glucagon, adiponectin, corticosterone, leptin and ghrelin, present circadian changes. Moreover, disturbance of circadian rhythms is related to occurrence of cancer, metabolic disorder, and change in weight; disharmony in circadian rhythms can compromise the functioning of organs and impact the overall metabolic systems in the body and has been correlated with adverse health outcomes, including diminished energy metabolism, impaired glucose metabolism, and heightened risk of cardiovascular disease .
 The digestion system and nutrients provide additional feedback to influence the organic clock.
- 
+
+ ![image](https://github.com/MyriamObialo/chrononutrition/assets/92102627/007f28cb-3a7b-47f3-95f3-98ee4e6f3a33)
+
 
 Research suggests that aligning meal timing with the body's natural circadian rhythm may have metabolic benefits. For instance, the consumption of a majority of calories during the earlier part of the day, when the body is most active and alert, is thought to be more beneficial than late night eating, specifically, studies show that consuming meals later in the day is associated with an elevated prevalence of metabolic disorders, while early time-restricted eating, such as having  an early breakfast and an earlier dinner, improves levels of glucose in the blood and substrate oxidation.   
 It was also observed that:
